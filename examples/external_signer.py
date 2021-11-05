@@ -1,10 +1,11 @@
+from gevent import monkey
+monkey.patch_all()
+
 import random
 from TikTokApi import browser
 from TikTokApi import TikTokApi
 from flask import Flask, request, jsonify
-from gevent import monkey
 
-monkey.patch_all()
 
 
 proxy = None
@@ -39,7 +40,6 @@ def sign_url():
 
 
 if __name__ == "__main__":
-    monkey.patch_all()
     app.run(debug=False, port=5000, host="0.0.0.0", threaded=True)
     print("Cleaning Up")
     try:
