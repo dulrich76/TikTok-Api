@@ -39,6 +39,7 @@ def sign_url():
 
 
 if __name__ == "__main__":
+    monkey.patch_all()
     app.run(debug=False, port=5000, host="0.0.0.0", threaded=True)
     print("Cleaning Up")
     try:
