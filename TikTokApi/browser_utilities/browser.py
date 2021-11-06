@@ -13,20 +13,6 @@ from urllib.parse import splitquery, parse_qs, parse_qsl
 
 # Import Detection From Stealth
 from .get_acrawler import get_acrawler, get_tt_params_script
-from playwright.sync_api import sync_playwright
-
-playwright = None
-
-
-def get_playwright():
-    global playwright
-    if playwright is None:
-        try:
-            playwright = sync_playwright().start()
-        except Exception as e:
-            raise e
-
-    return playwright
 
 
 class browser(BrowserInterface):
@@ -35,6 +21,7 @@ class browser(BrowserInterface):
         **kwargs,
     ):
         self.kwargs = kwargs
+        self.playwright = kwargs.get("playwright", None)
         self.debug = kwargs.get("debug", False)
         self.proxy = kwargs.get("proxy", None)
         self.api_url = kwargs.get("api_url", None)
@@ -42,6 +29,9 @@ class browser(BrowserInterface):
         self.language = kwargs.get("language", "en")
         self.executablePath = kwargs.get("executablePath", None)
         self.device_id = kwargs.get("custom_device_id", None)
+
+        if self.playwright is None:
+            raise Exception("playwright instance must be passed to browser object")
 
         args = kwargs.get("browser_args", [])
         options = kwargs.get("browser_options", {})
@@ -76,7 +66,7 @@ class browser(BrowserInterface):
             self.options["executablePath"] = self.executablePath
 
         try:
-            self.browser = get_playwright().webkit.launch(
+            self.browser = self.playwright.webkit.launch(
                 args=self.args, **self.options
             )
         except Exception as e:
@@ -119,7 +109,7 @@ class browser(BrowserInterface):
         self.height = page.evaluate("""() => { return screen.height; }""")
 
     def create_context(self, set_useragent=False):
-        iphone = playwright.devices["iPhone 11 Pro"]
+        iphone = self.playwright.devices["iPhone 11 Pro"]
         iphone["viewport"] = {
             "width": random.randint(320, 1920),
             "height": random.randint(320, 1920),
@@ -249,7 +239,7 @@ class browser(BrowserInterface):
             self.browser.close()
         except Exception:
             logging.info("cleanup failed")
-        # playwright.stop()
+        self.playwright.stop()
 
     def find_redirect(self, url):
         self.page.goto(url, {"waitUntil": "load"})

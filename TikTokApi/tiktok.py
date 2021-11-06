@@ -6,6 +6,7 @@ import string
 import time
 from urllib.parse import quote, urlencode
 
+import playwright.sync_api
 import requests
 from playwright.sync_api import sync_playwright
 
@@ -85,7 +86,7 @@ class TikTokApi:
             self.language = "en"
 
     @staticmethod
-    def get_instance(**kwargs):
+    def get_instance(playwright: playwright.sync_api.Playwright, **kwargs):
         """The TikTokApi class. Used to interact with TikTok. This is a singleton
             class to prevent issues from arising with playwright
 
@@ -147,6 +148,7 @@ class TikTokApi:
             that interact with this main class. These may or may not be documented
             in other places.
         """
+        kwargs["playwright"] = playwright
         if not TikTokApi.__instance:
             TikTokApi(**kwargs)
         return TikTokApi.__instance
@@ -159,10 +161,6 @@ class TikTokApi:
         """A basic cleanup method, called automatically from the code"""
         try:
             self.browser.clean_up()
-        except Exception:
-            pass
-        try:
-            get_playwright().stop()
         except Exception:
             pass
         TikTokApi.__instance = None
