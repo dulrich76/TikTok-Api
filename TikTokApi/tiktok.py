@@ -6,9 +6,8 @@ import string
 import time
 from urllib.parse import quote, urlencode
 
-import playwright.sync_api
 import requests
-from playwright.sync_api import sync_playwright
+import playwright.sync_api
 
 from .exceptions import *
 from .utilities import update_messager
@@ -20,15 +19,8 @@ BASE_URL = "https://m.tiktok.com/"
 
 
 class TikTokApi:
-    __instance = None
-
     def __init__(self, **kwargs):
         """The TikTokApi class. Used to interact with TikTok, use get_instance NOT this."""
-        # Forces Singleton
-        if TikTokApi.__instance is None:
-            TikTokApi.__instance = self
-        else:
-            raise Exception("Only one TikTokApi object is allowed")
         logging.basicConfig(level=kwargs.get("logging_level", logging.WARNING))
         logging.info("Class initalized")
 
@@ -149,9 +141,7 @@ class TikTokApi:
             in other places.
         """
         kwargs["playwright"] = playwright
-        if not TikTokApi.__instance:
-            TikTokApi(**kwargs)
-        return TikTokApi.__instance
+        return TikTokApi(**kwargs)
 
     def clean_up(self):
         """A basic cleanup method, called automatically from the code"""
@@ -163,7 +153,6 @@ class TikTokApi:
             self.browser.clean_up()
         except Exception:
             pass
-        TikTokApi.__instance = None
 
     def external_signer(self, url, custom_device_id=None, verifyFp=None):
         """Makes requests to an external signer instead of using a browser.
