@@ -239,7 +239,7 @@ class browser(BrowserInterface):
             self.browser.close()
         except Exception:
             logging.info("cleanup failed")
-        self.playwright.stop()
+        # self.playwright.stop()
 
     def find_redirect(self, url):
         self.page.goto(url, {"waitUntil": "load"})
